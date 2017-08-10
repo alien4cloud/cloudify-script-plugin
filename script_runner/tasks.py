@@ -61,6 +61,12 @@ UNSUPPORTED_SCRIPT_FEATURE_ERROR = \
 
 IS_WINDOWS = os.name == 'nt'
 
+def safe_remove_script(script_path):
+    try:
+        os.remove(script_path)
+    except Exception:
+        pass
+
 
 @operation
 def run(script_path, process=None, ssl_cert_content=None, **kwargs):
@@ -73,7 +79,7 @@ def run(script_path, process=None, ssl_cert_content=None, **kwargs):
     os.chmod(script_path, 0755)
     script_func = get_run_script_func(script_path, process)
     script_result = process_execution(script_func, script_path, ctx, process)
-    os.remove(script_path)
+    safe_remove_script(script_path)
     return script_result
 
 
@@ -84,7 +90,7 @@ def execute_workflow(script_path, ssl_cert_content=None, **kwargs):
         ctx.internal.handler.download_deployment_resource, script_path,
         ssl_cert_content)
     script_result = process_execution(eval_script, script_path, ctx)
-    os.remove(script_path)
+    safe_remove_script(script_path)
     return script_result
 
 
